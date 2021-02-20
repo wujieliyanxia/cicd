@@ -1,0 +1,5 @@
+node("test") {
+    stage('测试流水线') {
+        sh "ls /root"
+    }
+}
