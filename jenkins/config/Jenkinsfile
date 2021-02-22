@@ -19,13 +19,13 @@ node("test") {
         }
     }
     
-    // withEnv(['PATH=/usr/local/maven/bin/:/usr/local/java/jdk/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/root/bin']) {
-    //     stage('MVN打包') {
-    //         dir("master") {
-    //             sh "${mvnCmd} clean package -Pdev -Dmaven.test.skip=true -am"
-    //         }
-    //     }
-    // }
+    withEnv(['PATH=/usr/local/maven/bin/:/usr/local/java/jdk/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/root/bin']) {
+        stage('MVN打包') {
+            dir("master") {
+                sh "${mvnCmd} clean package -Pdev -Dmaven.test.skip=true -am"
+            }
+        }
+    }
 
     stage("拷贝jar包") {
         dir("master") {
