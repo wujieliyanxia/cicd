@@ -29,7 +29,7 @@ node("test") {
 
     stage("拷贝jar包") {
         dir("master") {
-            sh "cp -rf target/${jarName}.jar ../jenkins/${serviceName}/build.jar"
+            sh "cp -rf target/${jarName}.jar jenkins/${serviceName}/build.jar"
         }
     }
 
