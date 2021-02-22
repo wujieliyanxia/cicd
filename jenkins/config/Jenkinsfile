@@ -2,7 +2,7 @@ node("test") {
     def cicdRepo="git@github.com:doubledna/cicd.git"
     def businessRepo="git@github.com:wujieliyanxia/config.git"
 
-    echo "开始构建：config 分支：main Jenkins节点：${NODENAME}"
+    echo "开始构建：config 分支：main Jenkins节点：test"
 
     stage('拉取cicd代码'){
         git branch: "main", url: "${cicdRepo}"
