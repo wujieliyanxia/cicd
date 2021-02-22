@@ -1,6 +1,7 @@
 node("test") {
     def cicdRepo="git@github.com:doubledna/cicd.git"
     def businessRepo="git@github.com:wujieliyanxia/config.git"
+    def mvnCmd="/usr/local/maven/bin/mvn"
 
     echo "开始构建：config 分支：main Jenkins节点：test"
 
@@ -16,7 +17,7 @@ node("test") {
 
     stage('MVN打包') {
         dir("master") {
-            sh "mvn clean package -Pdev -Dmaven.test.skip=true -am"
+            sh "${mvnCmd} clean package -Pdev -Dmaven.test.skip=true -am"
         }
     }
 
