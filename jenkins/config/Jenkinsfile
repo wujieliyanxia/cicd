@@ -1,0 +1,28 @@
+node("test") {
+    def cicdRepo="git@github.com:doubledna/cicd.git"
+    def businessRepo="git@github.com:wujieliyanxia/config.git"
+
+    echo "开始构建：config 分支：main Jenkins节点：${NODENAME}"
+
+    stage('拉取cicd代码'){
+        git branch: "main", url: "${cicdRepo}"
+    }
+
+    stage('拉取业务代码') {
+        dir("master") {
+            git branch: "main", url: "${businessRepo}"
+        }
+    }
+
+    stage('MVN打包') {
+        dir("master") {
+            sh "mvn clean package -Pdev -Dmaven.test.skip=true -am"
+        }
+    }
+
+    stage("拷贝jar包") {
+        dir("master") {
+            sh "ls"
+        }
+    }
+}
