@@ -29,12 +29,14 @@ node("test") {
 
     stage("拷贝jar包") {
         dir("master") {
-            sh "cp -rf target/${jarName}.jar jenkins/${serviceName}/build.jar"
+            sh "cp -rf target/${jarName}.jar ../jenkins/${serviceName}/build.jar"
         }
     }
 
     stage("构建镜像") {
-        sh "docker build -t ${serviceName}:${imageTag} ."
+        dir("jenkins/${serviceName}") {
+            sh "docker build -t ${serviceName}:${imageTag} ."
+        }
     }
 
     stage("停止旧服务") {
