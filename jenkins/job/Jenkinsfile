@@ -1,0 +1,71 @@
+node("test") {
+    def cicdRepo="git@github.com:doubledna/cicd.git"
+    def businessRepo="git@github.com:wujieliyanxia/Job.git"
+    def mvnCmd="/usr/local/maven/bin/mvn"
+    // def imageTag="master-${BUILD_TIMESTAMP}"
+    def imageTag="master-${BUILD_TIMESTAMP}"
+    def serviceName="job"
+    def subProject="${params.SUBPROJECT}"
+
+    echo "开始构建：${subProject} 分支：main Jenkins节点：test"
+
+    stage('拉取cicd代码'){
+        git branch: "main", url: "${cicdRepo}"
+    }
+
+    stage('拉取业务代码') {
+        dir("master") {
+            git branch: "main", url: "${businessRepo}"
+        }
+    }
+
+    stage("Flyway or Deploy"){
+        if (subProject == 'job-sql') {
+            dir("master"){
+                sh "cd ${subProject} && ${mvnCmd} -Ptest initialize flyway:migrate"
+            }
+        } else {
+            withEnv(['PATH=/usr/local/maven/bin/:/usr/local/java/jdk/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/root/bin']) {
+                stage('MVN打包') {
+                    dir("master") {
+                        sh "${mvnCmd} clean package -Ptest -Dmaven.test.skip=true -pl ${subProject} -am"
+                    }
+                }
+            }        
+
+            stage("拷贝jar包") {
+                dir("master") {
+                    sh "cp -rf ${subProject}/target/${subProject}.jar ../jenkins/${serviceName}/${subProject}/build.jar"
+                }
+            }
+
+            stage("构建镜像") {
+                dir("jenkins/${serviceName}/${subProject}") {
+                    sh "docker build -t ${subProject}:${imageTag} ."
+                }
+            }
+
+            stage("停止旧服务") {
+                try {
+                    sh "docker stop ${subProject}"
+                } catch(err) {
+                    echo "服务停止失败，原因：${err}"
+                }
+            }
+
+            stage("删除旧服务") {
+                try {
+                    sh "docker rm ${subProject}"
+                } catch(err) {
+                    echo "服务停止失败，原因：${err}"
+                }
+            }
+
+            stage("部署服务") {
+                if (subProject == 'job-api') {
+                    sh "docker run -d --name ${subProject} -p 8887:8887 ${subProject}:${imageTag}"
+                }
+            } 
+        }
+    }   
+}
