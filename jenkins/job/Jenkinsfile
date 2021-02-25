@@ -23,7 +23,7 @@ node("test") {
         if (subProject == 'job-sql') {
             withEnv(['PATH=/usr/local/maven/bin/:/usr/local/java/jdk/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/root/bin']) {
                 dir("master"){
-                    sh "cd ${subProject} && ${mvnCmd} -Ptest compile initialize flyway:migrate"
+                    sh "cd ${subProject} && ${mvnCmd} -Ptest compile flyway:migrate"
                 }
             }
         } else {
